@@ -99,18 +99,31 @@ Simplified ScreenCapper Pro is a modular and automated pipeline for processing v
   sudo apt install zip unzip
   ```
 
-### Setting Up
+### Automated Installation with `install.sh`
+To simplify the setup process, an `install.sh` script is provided. This script will:
+
+1. Create the necessary folder structure.
+2. Install required Python libraries.
+3. Install necessary system packages.
+
+#### Steps
 1. Clone the repository:
    ```bash
-   git clone https://github.com/AsaTyr2018/Simplified-ScreenCapper-Pro <Base Directory>
-   cd <Base Directory>/00.scripts
+   git clone https://github.com/AsaTyr2018/Simplified-ScreenCapper-Pro
+   cd Simplified-ScreenCapper-Pro
    ```
-2. Download the YOLOv8 model:
+2. Run the installation script:
+   ```bash
+   ./install.sh
+   ```
+3. Follow the prompts:
+   - You can specify a custom base directory or use the current directory as the default.
+
+4. Download the YOLOv8 model:
    - Visit the [AniRef YOLOv8 GitHub Repository](https://github.com/SoulflareRC/AniRef-yolov8).
    - Download the `AniRef40000-l-epoch50.pt` model.
    - Place the model in the `00.scripts/model/` directory.
-3. Adjust the `BASE_DIR` in the `master.sh` script to match your custom folder structure. Replace `<Base Directory>` with the appropriate path for your setup.
-4. Make scripts executable:
+5. Make scripts executable:
    ```bash
    chmod -R +x <Base Directory>/00.scripts
    ```
