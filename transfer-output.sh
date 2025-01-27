@@ -3,7 +3,7 @@
 # Folder structure relative to the base directory
 BASE_DIR="$(dirname "$(dirname "$(realpath "$0")")")"
 SOURCE_DIR="${BASE_DIR}/6.quali_output"
-FINAL_OUTPUT_DIR="${BASE_DIR}/output"
+FINAL_OUTPUT_DIR="${BASE_DIR}/7.output"
 ARCHIVE_DIR="${BASE_DIR}/archiv/3.quali"
 TASK_FILE="${BASE_DIR}/00.scripts/task_running_TransferQualiToOutput"
 
