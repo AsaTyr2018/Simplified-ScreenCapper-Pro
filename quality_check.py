@@ -7,6 +7,7 @@ from pathlib import Path
 
 import cv2
 from skimage.metrics import structural_similarity as ssim
+import logging
 
 
 def calculate_ssim(image1, image2) -> float:
@@ -44,7 +45,7 @@ def deduplicate_images(input_folder: Path, output_folder: Path, similarity_thres
                 kept_images.append(image_path1)
                 output_path = output_folder / image_path1.name
                 cv2.imwrite(str(output_path), image1)
-                print(f"Saved: {output_path}")
+                logging.info("Saved: %s", output_path)
 
 
 def main() -> None:
@@ -57,10 +58,16 @@ def main() -> None:
     base_dir = Path(args.base_dir)
     input_dir = base_dir / "5.quali_input"
     output_dir = base_dir / "6.quali_output"
+    task_file = base_dir / "00.scripts" / "task_running_QualityCheck"
 
-    print("Starting Quality Control...")
-    deduplicate_images(input_dir, output_dir, args.ssim, args.edge)
-    print("Quality Control completed. Results saved in the output folder.")
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    logging.info("Starting Quality Control...")
+    task_file.touch()
+    try:
+        deduplicate_images(input_dir, output_dir, args.ssim, args.edge)
+    finally:
+        task_file.unlink(missing_ok=True)
+    logging.info("Quality Control completed. Results saved in the output folder.")
 
 
 if __name__ == "__main__":

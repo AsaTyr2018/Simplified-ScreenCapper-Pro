@@ -12,6 +12,7 @@ echo "Starting transfer script: QUALI -> OUTPUT"
 
 # Create task indicator
 touch "$TASK_FILE"
+trap 'rm -f "$TASK_FILE"' EXIT
 
 # Ensure the archive folder exists
 mkdir -p "$ARCHIVE_DIR"
@@ -24,7 +25,14 @@ zip -r "$ZIP_NAME" "$SOURCE_DIR" >/dev/null
 
 # Move files to the final output directory
 mkdir -p "$FINAL_OUTPUT_DIR"
-mv "$SOURCE_DIR/"* "$FINAL_OUTPUT_DIR/"
+shopt -s nullglob
+files=("$SOURCE_DIR"/*)
+if [ ${#files[@]} -gt 0 ]; then
+    mv "${files[@]}" "$FINAL_OUTPUT_DIR/"
+else
+    echo "No files to move."
+fi
+shopt -u nullglob
 echo "Transfer completed: QUALI -> OUTPUT"
 
 # Cleaner: Clear all processing folders (except archive)

@@ -12,6 +12,7 @@ echo "Starting transfer script: CAP -> FACE"
 
 # Create task indicator
 touch "$TASK_FILE"
+trap 'rm -f "$TASK_FILE"' EXIT
 
 # Ensure the archive folder exists
 mkdir -p "$ARCHIVE_DIR"
@@ -22,9 +23,12 @@ ZIP_NAME="${ARCHIVE_DIR}/cap_output_${TIMESTAMP}.zip"
 echo "Creating ZIP archive: $ZIP_NAME"
 zip -r "$ZIP_NAME" "$SOURCE_DIR" >/dev/null
 
-# Move files to the target directory
-mv "$SOURCE_DIR/"* "$TARGET_DIR/"
+shopt -s nullglob
+files=("$SOURCE_DIR"/*)
+if [ ${#files[@]} -gt 0 ]; then
+    mv "${files[@]}" "$TARGET_DIR/"
+else
+    echo "No files to move."
+fi
+shopt -u nullglob
 echo "Transfer completed: CAP -> FACE"
-
-# Remove task indicator
-rm "$TASK_FILE"
