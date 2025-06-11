@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Base directory
 BASE_DIR="./"
@@ -66,6 +67,6 @@ run_shell_task "Transfer to Quality Check" "${SCRIPT_DIR}/transfer-face-quali.sh
 run_python_task "Quality Check" "${SCRIPT_DIR}/quality_check.py" "${SCRIPT_DIR}/task_running_QualityCheck"
 
 # Task 6: Transfer (QUALI -> output)
-run_shell_task "Transfer to Output and Cleanup" "${SCRIPT_DIR}/transfer-output.sh" "${SCRIPT_DIR}/task_running_TransferQualiToOutput"
+run_shell_task "Transfer to Output and Cleanup" "${SCRIPT_DIR}/transfer-output.sh" "${SCRIPT_DIR}/task_running_TransferOutput"
 
 echo "All tasks completed. Master script finished."

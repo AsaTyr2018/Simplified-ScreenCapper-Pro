@@ -1,50 +1,56 @@
+#!/usr/bin/env python3
+"""Extract frames from video files."""
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+
 import cv2
-import os
 from tqdm import tqdm
 
-# Base directories
-base_dir = "./"
-cap_input_dir = os.path.join(base_dir, "1.cap_input")
-cap_output_dir = os.path.join(base_dir, "2.cap_output")
 
-# Ensure directories exist
-os.makedirs(cap_input_dir, exist_ok=True)
-os.makedirs(cap_output_dir, exist_ok=True)
+def extract_frames(input_dir: Path, output_dir: Path) -> None:
+    """Extract frames from all videos in *input_dir* into *output_dir*."""
+    input_dir.mkdir(parents=True, exist_ok=True)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-def extract_frames():
-    # Search for video files in the input folder
-    video_files = [f for f in os.listdir(cap_input_dir) if f.lower().endswith((".mp4", ".avi", ".mkv"))]
-
+    video_files = [f for f in input_dir.iterdir() if f.suffix.lower() in {".mp4", ".avi", ".mkv"}]
     if not video_files:
         print("No videos found in the input folder.")
         return
 
-    for video_file in tqdm(video_files, desc="Overall Progress", unit="Video"):
-        video_path = os.path.join(cap_input_dir, video_file)
-        video_name = os.path.splitext(video_file)[0]
-
-        # Open video file
-        cap = cv2.VideoCapture(video_path)
-        frame_count = 0
+    for video_file in tqdm(video_files, desc="Overall Progress", unit="video"):
+        cap = cv2.VideoCapture(str(video_file))
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        frame_count = 0
+        video_name = video_file.stem
 
-        with tqdm(total=total_frames, desc=f"Processing: {video_file}", unit="Frame") as pbar:
+        with tqdm(total=total_frames, desc=f"Processing: {video_file.name}", unit="frame") as pbar:
             while cap.isOpened():
                 ret, frame = cap.read()
                 if not ret:
                     break
-
-                # Save frame directly to 2.cap_output
-                frame_path = os.path.join(cap_output_dir, f"{video_name}_frame_{frame_count:05d}.jpg")
-                cv2.imwrite(frame_path, frame)
-
+                frame_path = output_dir / f"{video_name}_frame_{frame_count:05d}.jpg"
+                cv2.imwrite(str(frame_path), frame)
                 frame_count += 1
                 pbar.update(1)
-
         cap.release()
-        print(f"Frames extracted: {frame_count} frames saved to {cap_output_dir}")
+        print(f"Frames extracted: {frame_count} frames saved to {output_dir}")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Extract frames from videos")
+    parser.add_argument("--base-dir", default="./", help="Base directory for input/output")
+    args = parser.parse_args()
+
+    base_dir = Path(args.base_dir)
+    input_dir = base_dir / "1.cap_input"
+    output_dir = base_dir / "2.cap_output"
+
+    print("Starting frame extraction for anime videos...")
+    extract_frames(input_dir, output_dir)
+    print("All videos have been processed.")
+
 
 if __name__ == "__main__":
-    print("Starting frame extraction for anime videos...")
-    extract_frames()
-    print("All videos have been processed.")
+    main()

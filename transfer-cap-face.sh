@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Folder structure relative to the base directory
 BASE_DIR="$(dirname "$(dirname "$(realpath "$0")")")"
