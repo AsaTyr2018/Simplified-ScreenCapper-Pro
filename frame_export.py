@@ -7,6 +7,7 @@ from pathlib import Path
 
 import cv2
 from tqdm import tqdm
+import logging
 
 
 def extract_frames(input_dir: Path, output_dir: Path) -> None:
@@ -16,7 +17,7 @@ def extract_frames(input_dir: Path, output_dir: Path) -> None:
 
     video_files = [f for f in input_dir.iterdir() if f.suffix.lower() in {".mp4", ".avi", ".mkv"}]
     if not video_files:
-        print("No videos found in the input folder.")
+        logging.info("No videos found in the input folder.")
         return
 
     for video_file in tqdm(video_files, desc="Overall Progress", unit="video"):
@@ -35,7 +36,7 @@ def extract_frames(input_dir: Path, output_dir: Path) -> None:
                 frame_count += 1
                 pbar.update(1)
         cap.release()
-        print(f"Frames extracted: {frame_count} frames saved to {output_dir}")
+        logging.info("Frames extracted: %d frames saved to %s", frame_count, output_dir)
 
 
 def main() -> None:
@@ -47,9 +48,16 @@ def main() -> None:
     input_dir = base_dir / "1.cap_input"
     output_dir = base_dir / "2.cap_output"
 
-    print("Starting frame extraction for anime videos...")
-    extract_frames(input_dir, output_dir)
-    print("All videos have been processed.")
+    task_file = base_dir / "00.scripts" / "task_running_Cap01"
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+
+    logging.info("Starting frame extraction for anime videos...")
+    task_file.touch()
+    try:
+        extract_frames(input_dir, output_dir)
+    finally:
+        task_file.unlink(missing_ok=True)
+    logging.info("All videos have been processed.")
 
 
 if __name__ == "__main__":

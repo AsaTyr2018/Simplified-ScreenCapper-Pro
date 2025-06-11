@@ -54,6 +54,10 @@ Simplified ScreenCapper Pro is a modular and automated pipeline for processing v
 - **Cleanup**: Clears all process folders (`1.cap_input` to `6.quali_output`).
 - **Task Indicator**: `task_running_TransferOutput`.
 
+### 7. Queue Pruning (`pruning.sh`)
+- **Purpose**: Manually clear all queue folders.
+- **Safety**: Asks for confirmation before deleting files.
+
 ---
 
 ## Folder Structure
@@ -68,6 +72,7 @@ Simplified ScreenCapper Pro is a modular and automated pipeline for processing v
 │   ├── transfer-cap-face.sh   # Transfer: CAP -> FACE
 │   ├── transfer-face-quali.sh # Transfer: FACE -> QUALI
 │   ├── transfer-output.sh     # Transfer: QUALI -> OUTPUT
+│   ├── pruning.sh            # Clear all queue folders
 │   └── model/                 # YOLOv8 model file
 │       └── AniRef40000-l-epoch50.pt
 ├── 1.cap_input/               # Input folder for raw videos
