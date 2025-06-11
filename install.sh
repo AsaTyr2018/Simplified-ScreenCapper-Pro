@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Install script for Simplified ScreenCapper Pro
 

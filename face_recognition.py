@@ -1,78 +1,75 @@
-import os
+#!/usr/bin/env python3
+"""Face detection using YOLOv8."""
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+
 import cv2
 from tqdm import tqdm
 from ultralytics import YOLO
 
-# Base directories
-base_dir = "./"
-model_dir = os.path.join(base_dir, "00.scripts/model")
-face_input_dir = os.path.join(base_dir, "3.face_input")
-face_output_dir = os.path.join(base_dir, "4.face_output")
 
-# YOLOv8 model path
-yolo_model_path = os.path.join(model_dir, "AniRef40000-l-epoch50.pt")
+def load_yolo_model(model_path: Path) -> YOLO:
+    """Load the YOLOv8 model."""
+    if not model_path.exists():
+        raise FileNotFoundError(f"YOLO model not found: {model_path}")
+    return YOLO(str(model_path))
 
-# Ensure directories exist
-os.makedirs(face_input_dir, exist_ok=True)
-os.makedirs(face_output_dir, exist_ok=True)
 
-# Lazy loader for YOLO model
-def load_yolo_model():
-    if not os.path.exists(yolo_model_path):
-        raise FileNotFoundError(f"YOLO model not found: {yolo_model_path}")
-    return YOLO(yolo_model_path)
-
-# Function: Detect faces using YOLOv8
-def detect_faces(frame, frame_count, yolo_model):
-    results = yolo_model(frame)
-    detected_faces = []
-
-    # Results as bounding boxes
+def detect_faces(frame, frame_index: int, model: YOLO, output_dir: Path) -> None:
+    """Detect faces in a single frame and write them to *output_dir*."""
+    results = model(frame)
     for i, box in enumerate(results[0].boxes):
-        x1, y1, x2, y2 = map(int, box.xyxy[0].tolist())  # Bounding box coordinates
-        conf = box.conf[0]  # Confidence
-        if conf >= 0.5:  # Confidence threshold
-            face_image = frame[y1:y2, x1:x2]
-            output_path = os.path.join(face_output_dir, f"frame_{frame_count}_face_{i}.jpg")
-            cv2.imwrite(output_path, face_image)
-            detected_faces.append(output_path)
+        conf = float(box.conf[0])
+        if conf < 0.5:
+            continue
+        x1, y1, x2, y2 = map(int, box.xyxy[0].tolist())
+        face_img = frame[y1:y2, x1:x2]
+        out_path = output_dir / f"frame_{frame_index}_face_{i}.jpg"
+        cv2.imwrite(str(out_path), face_img)
 
-    return detected_faces
 
-# Function: Process frames
-def process_faces():
-    frame_files = [f for f in os.listdir(face_input_dir) if f.lower().endswith(('.jpg', '.png', '.jpeg'))]
+def process_faces(input_dir: Path, output_dir: Path, model_path: Path) -> None:
+    """Process all frames in *input_dir* and save faces to *output_dir*."""
+    input_dir.mkdir(parents=True, exist_ok=True)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-    if not frame_files:
+    files = [f for f in input_dir.iterdir() if f.suffix.lower() in {".jpg", ".png", ".jpeg"}]
+    if not files:
         print("No frames found in the input directory.")
         return
 
-    yolo_model = load_yolo_model()
-    print(f"YOLO model loaded successfully: {yolo_model_path}")
+    model = load_yolo_model(model_path)
+    print(f"YOLO model loaded successfully: {model_path}")
+    print(f"\nProcessing frames from: {input_dir}")
 
-    print(f"\nProcessing frames from: {face_input_dir}")
-    for frame_file in tqdm(frame_files, desc="Processing", unit="Frame"):
-        frame_path = os.path.join(face_input_dir, frame_file)
-        frame = cv2.imread(frame_path)
-        frame_count = int(os.path.splitext(frame_file)[0].split('_')[-1])  # Optional: Extract frame index
+    for frame_file in tqdm(files, desc="Processing", unit="frame"):
+        frame = cv2.imread(str(frame_file))
+        frame_index = int(frame_file.stem.split("_")[-1])
+        detect_faces(frame, frame_index, model, output_dir)
 
-        # Detect faces
-        detect_faces(frame, frame_count, yolo_model)
+    print(f"Processing complete: Results in {output_dir}")
 
-    print(f"Processing complete: Results in {face_output_dir}")
 
-# Main program
-if __name__ == "__main__":
-    # Task indicator
-    task_file = "./00.scripts/task_running_Face01"
-    open(task_file, 'w').close()  # Start task
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Detect faces using YOLOv8")
+    parser.add_argument("--base-dir", default="./", help="Base directory for input/output")
+    args = parser.parse_args()
 
+    base_dir = Path(args.base_dir)
+    model_path = base_dir / "00.scripts" / "model" / "AniRef40000-l-epoch50.pt"
+    input_dir = base_dir / "3.face_input"
+    output_dir = base_dir / "4.face_output"
+    task_file = base_dir / "00.scripts" / "task_running_Face01"
+
+    task_file.touch()
     try:
-        print("Starting face detection with YOLOv8...")
-        process_faces()
+        process_faces(input_dir, output_dir, model_path)
     finally:
-        # Remove task indicator
-        if os.path.exists(task_file):
-            os.remove(task_file)
-
+        task_file.unlink(missing_ok=True)
     print("All frames have been processed.")
+
+
+if __name__ == "__main__":
+    main()
