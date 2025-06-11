@@ -27,7 +27,9 @@ zip -r "$ZIP_NAME" "$SOURCE_DIR" >/dev/null
 shopt -s nullglob
 files=("$SOURCE_DIR"/*)
 if [ ${#files[@]} -gt 0 ]; then
-    mv "${files[@]}" "$TARGET_DIR/"
+    for file in "${files[@]}"; do
+        mv "$file" "$TARGET_DIR/"
+    done
 else
     echo "No files to move."
 fi
