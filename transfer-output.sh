@@ -28,7 +28,9 @@ mkdir -p "$FINAL_OUTPUT_DIR"
 shopt -s nullglob
 files=("$SOURCE_DIR"/*)
 if [ ${#files[@]} -gt 0 ]; then
-    mv "${files[@]}" "$FINAL_OUTPUT_DIR/"
+    for file in "${files[@]}"; do
+        mv "$file" "$FINAL_OUTPUT_DIR/"
+    done
 else
     echo "No files to move."
 fi
