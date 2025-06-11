@@ -108,8 +108,10 @@ Simplified ScreenCapper Pro is a modular and automated pipeline for processing v
 To simplify the setup process, an `install.sh` script is provided. This script will:
 
 1. Create the necessary folder structure.
-2. Install required Python libraries.
-3. Install necessary system packages.
+2. Move all pipeline scripts into the `00.scripts` directory.
+3. Install required Python libraries.
+4. Install necessary system packages.
+5. Set executable permissions for the scripts.
 
 #### Steps
 1. Clone the repository:
@@ -128,10 +130,7 @@ To simplify the setup process, an `install.sh` script is provided. This script w
    - Visit the [AniRef YOLOv8 GitHub Repository](https://github.com/SoulflareRC/AniRef-yolov8).
    - Download the `AniRef40000-l-epoch50.pt` model.
    - Place the model in the `00.scripts/model/` directory.
-5. Make scripts executable:
-   ```bash
-   chmod -R +x <Base Directory>/00.scripts
-   ```
+5. The installation script automatically sets execute permissions for all scripts.
 
 ---
 
