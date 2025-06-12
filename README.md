@@ -145,6 +145,21 @@ Run the pipeline manually using:
 ### Optional Daemon
 You can optionally set up a **systemd daemon** to automate the pipeline. The daemon will check the `1.cap_input/` folder every 5 minutes and trigger the pipeline if files are detected. Refer to the `import-checker.timer` and `import-checker.service` configuration for details.
 
+## Telemetry Dashboard
+
+Start the dashboard server:
+```bash
+python3 dashboard.py
+```
+
+Agents post metrics using:
+```bash
+python3 telemetry_agent.py --server http://<dashboard-host>:5000/telemetry
+```
+
+The dashboard shows RAM, CPU, connected users and root storage for each agent.
+
+
 ---
 
 ## Planned Features

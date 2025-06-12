@@ -30,6 +30,9 @@ REQUIREMENTS=(
     "tqdm"
     "ultralytics"
     "scikit-image"
+    "psutil"
+    "flask"
+    "requests"
 )
 
 # Required system packages
